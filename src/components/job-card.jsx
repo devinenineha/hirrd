@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
 import { BarLoader } from "react-spinners";
 
 const JobCard = ({
-  job = {}, // ✅ Default empty object to prevent errors
+  job,
   savedInit = false,
   onJobAction = () => {},
   isMyJob = false,
@@ -26,7 +26,7 @@ const JobCard = ({
   const { user } = useUser();
 
   const { loading: loadingDeleteJob, fn: fnDeleteJob } = useFetch(deleteJob, {
-    job_id: job?.id, // ✅ Safe access
+    job_id: job.id,
   });
 
   const {
@@ -36,7 +36,6 @@ const JobCard = ({
   } = useFetch(saveJob);
 
   const handleSaveJob = async () => {
-    if (!job?.id || !user?.id) return; // ✅ Prevents running if job or user is missing
     await fnSavedJob({
       user_id: user.id,
       job_id: job.id,
@@ -45,7 +44,6 @@ const JobCard = ({
   };
 
   const handleDeleteJob = async () => {
-    if (!job?.id) return; // ✅ Prevents running if job is missing
     await fnDeleteJob();
     onJobAction();
   };
@@ -54,10 +52,6 @@ const JobCard = ({
     if (savedJob !== undefined) setSaved(savedJob?.length > 0);
   }, [savedJob]);
 
-  if (!job || !job.title) {
-    return <div className="text-red-500"></div>; // ✅ Shows message instead of breaking
-  }
-
   return (
     <Card className="flex flex-col">
       {loadingDeleteJob && (
@@ -65,8 +59,8 @@ const JobCard = ({
       )}
       <CardHeader className="flex">
         <CardTitle className="flex justify-between font-bold">
-          {job.title || "No Title Available"}
-          {isMyJob && job.id && ( // ✅ Safe check
+          {job.title}
+          {isMyJob && (
             <Trash2Icon
               fill="red"
               size={18}
@@ -78,26 +72,20 @@ const JobCard = ({
       </CardHeader>
       <CardContent className="flex flex-col gap-4 flex-1">
         <div className="flex justify-between">
-          {job.company?.logo_url && ( // ✅ Safe check for company logo
-            <img src={job.company.logo_url} className="h-6" alt="Company Logo" />
-          )}
+          {job.company && <img src={job.company.logo_url} className="h-6" />}
           <div className="flex gap-2 items-center">
-            <MapPinIcon size={15} /> {job.location || "Location not specified"}
+            <MapPinIcon size={15} /> {job.location}
           </div>
         </div>
         <hr />
-        {job.description
-          ? job.description.substring(0, job.description.indexOf(".")) + "."
-          : "No description available."}
+        {job.description.substring(0, job.description.indexOf("."))}.
       </CardContent>
       <CardFooter className="flex gap-2">
-        {job.id && ( // ✅ Safe check before linking
-          <Link to={`/job/${job.id}`} className="flex-1">
-            <Button variant="secondary" className="w-full">
-              More Details
-            </Button>
-          </Link>
-        )}
+        <Link to={`/job/${job.id}`} className="flex-1">
+          <Button variant="secondary" className="w-full">
+            More Details
+          </Button>
+        </Link>
         {!isMyJob && (
           <Button
             variant="outline"

@@ -105,7 +105,7 @@ const JobPage = () => {
       </h2>
       <MDEditor.Markdown
         source={job?.requirements}
-        className="bg-transparent sm:text-lg" // add global ul styles - tutorial
+        className="bg-transparent text-white sm:text-lg whitespace-pre-line"       // add global ul styles - tutorial
       />
       {job?.recruiter_id !== user?.id && (
         <ApplyJobDrawer
